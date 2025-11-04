@@ -31,8 +31,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Fetch tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-      - name: Set package name and version
+        with:
+          fetch-depth: 0
+          fetch-tags: true
         id: set-version
         run: |
           set -x
