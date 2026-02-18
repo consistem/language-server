@@ -162,7 +162,7 @@ export async function activate(context: ExtensionContext) {
 		wsFolderServerSpecs.clear();
 		client.sendNotification("intersystems/server/connectionChange");
 	});
-	const serverManagerExt = extensions.getExtension("intersystems-community.servermanager");
+	const serverManagerExt = extensions.getExtension("consistem-sistemas.servermanager");
 	if (serverManagerExt !== undefined) {
 		// The server manager extension is installed
 		serverManagerApi = serverManagerExt.isActive ? serverManagerExt.exports : await serverManagerExt.activate();
