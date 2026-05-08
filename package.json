@@ -4,7 +4,7 @@
   "description": "A language server for InterSystems ObjectScript, based on the official project and maintained by Consistem.",
   "author": "InterSystems Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
-  "version": "2.8.3-SNAPSHOT",
+  "version": "2.8.4-SNAPSHOT",
   "publisher": "consistem-sistemas",
   "repository": {
     "type": "github",
@@ -1794,22 +1794,34 @@
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "clean": "rimraf client/out && rimraf server/out",
+    "lint": "eslint && prettier --check .",
+    "lint-fix": "prettier --write . && eslint --fix",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd .."
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.15.33",
+    "@types/turndown": "^5.0.6",
     "@vscode/vsce": "^3.7.1",
     "cross-env": "^10.1.0",
+    "eslint": "^10.2.1",
     "merge-options": "^3.0.4",
     "node-loader": "^2.1.0",
-    "ovsx": "^0.10.7",
+    "node-sarif-builder": "^4.1.0",
+    "ovsx": "^0.10.11",
+    "prettier": "^3.8.3",
     "rimraf": "^6.0.1",
     "ts-loader": "^9.5.2",
     "typescript": "^5.5.4",
-    "webpack": "^5.100.2",
-    "webpack-cli": "^6.0.1"
+    "typescript-eslint": "^8.59.0",
+    "webpack": "^5.106.1",
+    "webpack-cli": "^7.0.2"
   },
   "extensionDependencies": [
     "consistem-sistemas.vscode-objectscript"
-  ]
+  ],
+  "prettier": {
+    "useTabs": true,
+    "printWidth": 120
+  }
 }
