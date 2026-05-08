@@ -37,7 +37,13 @@ import {
 	setSelection,
 } from "./commands";
 import { makeRESTRequest, ServerSpec } from "./makeRESTRequest";
-import { allowManualFormat, blockFormatAfterCompile, scheduleFormatSkip, clearFormatSkip, removeFormatSkip } from "./ccs/formattingControl";
+import {
+	allowManualFormat,
+	blockFormatAfterCompile,
+	scheduleFormatSkip,
+	clearFormatSkip,
+	removeFormatSkip,
+} from "./ccs/formattingControl";
 import { ISCEmbeddedContentProvider, requestForwardingMiddleware } from "./requestForwarding";
 
 export let client: LanguageClient;
@@ -325,7 +331,6 @@ export async function activate(context: ExtensionContext) {
 		commands.registerCommand("intersystems.language-server.showSymbolInClass", showSymbolInClass),
 		commands.registerTextEditorCommand("intersystems.language-server.setSelection", setSelection),
 
-
 		workspace.onWillSaveTextDocument((event) => {
 			if (targetLanguages.includes(event.document.languageId) && targetSchemes.includes(event.document.uri.scheme)) {
 				scheduleFormatSkip(event.document.uri.toString(true));
@@ -345,7 +350,7 @@ export async function activate(context: ExtensionContext) {
 			const commandsApi = commands as typeof commands & {
 				onDidExecuteCommand?: (listener: (e: CommandExecutionEvent) => any) => { dispose(): any };
 			};
-			if (typeof commandsApi.onDidExecuteCommand !== 'function') {
+			if (typeof commandsApi.onDidExecuteCommand !== "function") {
 				return { dispose: () => undefined };
 			}
 			return commandsApi.onDidExecuteCommand((event) => {
@@ -353,16 +358,20 @@ export async function activate(context: ExtensionContext) {
 				if (activeDoc === undefined) return;
 				if (!targetLanguages.includes(activeDoc.languageId) || !targetSchemes.includes(activeDoc.uri.scheme)) return;
 				const activeUri = activeDoc.uri.toString(true);
-				if (event.command === 'editor.action.formatDocument') {
+				if (event.command === "editor.action.formatDocument") {
 					allowManualFormat(activeUri);
 					return;
 				}
-				if (event.command === 'vscode.executeFormatDocumentProvider') {
+				if (event.command === "vscode.executeFormatDocumentProvider") {
 					allowManualFormat(activeUri);
 					return;
 				}
 				const lower = event.command.toLowerCase();
-				if (lower.includes('compile') || lower === 'objectscript.compileandrun' || lower === 'objectscript.compileandsave') {
+				if (
+					lower.includes("compile") ||
+					lower === "objectscript.compileandrun" ||
+					lower === "objectscript.compileandsave"
+				) {
 					blockFormatAfterCompile(activeUri);
 				}
 			});

@@ -1,6 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 'use strict';
 
 const fs = require('fs');
@@ -36,7 +33,6 @@ function isMusl() {
 	// On musl-based distros (e.g. Alpine), this is typically absent.
 	try {
 		// process.report is available on modern Node.
-		// eslint-disable-next-line no-undef
 		const report = process.report?.getReport?.();
 		return !(report?.header?.glibcVersionRuntime);
 	} catch {

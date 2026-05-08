@@ -202,7 +202,7 @@ export async function onSignatureHelp(params: SignatureHelpParams): Promise<Sign
 			1
 	) {
 		if (params.context.activeSignatureHelp) {
-			params.context.activeSignatureHelp.signatures[0].documentation = signatureHelpDocumentationCache.doc;
+			params.context.activeSignatureHelp.signatures[0].documentation = signatureHelpDocumentationCache?.doc;
 			return params.context.activeSignatureHelp;
 		} else {
 			return null;
@@ -764,36 +764,38 @@ export async function onSignatureHelp(params: SignatureHelpParams): Promise<Sign
 							};
 						}
 					}
-				} else {
-					const routineDetails = await getRoutineSignatureDetails(
-						doc,
-						parsed,
-						sigstartln,
-						sigstarttkn,
-						params.textDocument.uri,
-						server,
-					);
-					if (routineDetails !== null) {
-						const startPos = routineDetails.start;
-						const beforeStart =
-							params.position.line < startPos.line ||
-							(params.position.line == startPos.line && params.position.character < startPos.character);
-						const activeParamValue = beforeStart
-							? 0
-							: determineActiveParam(doc.getText(Range.create(startPos, params.position)));
-						const boundedIndex = routineDetails.signature.parameters.length
-							? Math.min(Math.max(activeParamValue ?? 0, 0), routineDetails.signature.parameters.length - 1)
-							: null;
-						const docContent = buildRoutineDocumentation(routineDetails.signature, boundedIndex, { context: "signature" });
-						signatureHelpDocumentationCache = { type: "routine", doc: docContent };
-						routineDetails.signature.documentation = docContent;
-						signatureHelpStartPosition = startPos;
-						return {
-							signatures: [routineDetails.signature],
-							activeSignature: 0,
-							activeParameter: boundedIndex,
-						};
-					}
+				}
+			} else {
+				const routineDetails = await getRoutineSignatureDetails(
+					doc,
+					parsed,
+					sigstartln,
+					sigstarttkn,
+					params.textDocument.uri,
+					server,
+				);
+				if (routineDetails !== null) {
+					const startPos = routineDetails.start;
+					const beforeStart =
+						params.position.line < startPos.line ||
+						(params.position.line == startPos.line && params.position.character < startPos.character);
+					const activeParamValue = beforeStart
+						? 0
+						: determineActiveParam(doc.getText(Range.create(startPos, params.position)));
+					const boundedIndex = routineDetails.signature.parameters.length
+						? Math.min(Math.max(activeParamValue ?? 0, 0), routineDetails.signature.parameters.length - 1)
+						: null;
+					const docContent = buildRoutineDocumentation(routineDetails.signature, boundedIndex, {
+						context: "signature",
+					});
+					signatureHelpDocumentationCache = { type: "routine", doc: docContent };
+					routineDetails.signature.documentation = docContent;
+					signatureHelpStartPosition = startPos;
+					return {
+						signatures: [routineDetails.signature],
+						activeSignature: 0,
+						activeParameter: boundedIndex,
+					};
 				}
 			}
 		}

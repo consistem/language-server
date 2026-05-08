@@ -12,5 +12,24 @@ export default tseslint.config(
             "@typescript-eslint/no-explicit-any": "off",
 			"no-control-regex": "off",
         },
+    },
+    {
+        files: ["scripts/**/*.js"],
+        languageOptions: {
+            globals: {
+                require: "readonly",
+                module: "readonly",
+                exports: "writable",
+                process: "readonly",
+                console: "readonly",
+                __dirname: "readonly",
+                __filename: "readonly",
+                Buffer: "readonly",
+            },
+            sourceType: "commonjs",
+        },
+        rules: {
+            "@typescript-eslint/no-require-imports": "off",
+        },
     }
 );
