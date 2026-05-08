@@ -10,7 +10,7 @@
 
 ## Comandos (build, teste e desenvolvimento)
 
-Use Node.js 20 (mesma versão do CI).
+Use Node.js 24 (mesma versão do CI).
 
 - `npm install`: Instala dependências na raiz e executa `postinstall` para instalar deps de `client/` e `server/`.
 - `npm run compile`: Build TypeScript (`tsc -b`) de `client/` + `server/`.
@@ -33,7 +33,7 @@ Observação: `npm run webpack` e `npm run webpack:dev` já executam `select-isc
 
 ## Estilo de código e convenções
 
-- TypeScript seguindo as convenções do repo: tabs (não espaços) e, em geral, aspas simples.
+- TypeScript seguindo as convenções do repo: tabs (não espaços) e aspas duplas (Prettier).
 - Mantenha mudanças consistentes com arquivos próximos (importações, ponto e vírgula, nomes).
 - Prefira commits pequenos e focados; evite alterações desnecessárias em lockfiles (`package-lock.json`).
 
@@ -42,7 +42,7 @@ Observação: `npm run webpack` e `npm run webpack:dev` já executam `select-isc
 Não há uma suíte dedicada de testes unitários neste repositório. Valide mudanças com:
 
 - `npm run compile` (typecheck/build)
-- Rodando a extensão via VS Code `.vscode/launch.json` (“Launch Client”) e exercitando a funcionalidade alterada.
+- Rodando a extensão via VS Code `.vscode/launch.json` ("Launch Client") e exercitando a funcionalidade alterada.
 
 ## Commits e Pull Requests
 

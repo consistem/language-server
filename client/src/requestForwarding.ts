@@ -1,7 +1,16 @@
-import { commands, CompletionList, Hover, Position, SignatureHelp, TextDocumentContentProvider, Uri } from 'vscode';
-import { Middleware } from 'vscode-languageclient';
-import { client } from './extension';
-import { consumeFormatSkip } from './ccs/formattingControl';
+import {
+	commands,
+	CompletionList,
+	Hover,
+	Position,
+	ProviderResult,
+	SignatureHelp,
+	TextDocumentContentProvider,
+	Uri,
+} from "vscode";
+import { Middleware } from "vscode-languageclient";
+import { client } from "./extension";
+import { consumeFormatSkip } from "./ccs/formattingControl";
 
 export const requestForwardingMiddleware: Middleware = {
 	provideCompletionItem: async (document, position, context, token, next) => {
@@ -13,9 +22,9 @@ export const requestForwardingMiddleware: Middleware = {
 		const originalUri = document.uri.toString(true);
 		const language: number = await client.sendRequest("intersystems/embedded/languageAtPosition", {
 			textDocument: {
-				uri: originalUri
+				uri: originalUri,
 			},
-			position: position
+			position: position,
 		});
 
 		let vdocExt: string = "";
@@ -33,14 +42,14 @@ export const requestForwardingMiddleware: Middleware = {
 		if (vdocExt != "") {
 			// Forward the request
 			const vdocUriString = `isc-embedded-content://${language}:${position.line}-${position.character}/${encodeURIComponent(
-				originalUri
+				originalUri,
 			)}.${vdocExt}`;
 			const vdocUri = Uri.parse(vdocUriString);
 			return await commands.executeCommand<CompletionList>(
 				"vscode.executeCompletionItemProvider",
 				vdocUri,
 				position,
-				context.triggerCharacter
+				context.triggerCharacter,
 			);
 		} else {
 			// Do not forward the request
@@ -63,9 +72,9 @@ export const requestForwardingMiddleware: Middleware = {
 		const originalUri = document.uri.toString(true);
 		const language: number = await client.sendRequest("intersystems/embedded/languageAtPosition", {
 			textDocument: {
-				uri: originalUri
+				uri: originalUri,
 			},
-			position: position
+			position: position,
 		});
 
 		let vdocExt: string = "";
@@ -82,14 +91,12 @@ export const requestForwardingMiddleware: Middleware = {
 		if (vdocExt != "") {
 			// Forward the request
 			const vdocUriString = `isc-embedded-content://${language}:${position.line}-${position.character}/${encodeURIComponent(
-				originalUri
+				originalUri,
 			)}.${vdocExt}`;
 			const vdocUri = Uri.parse(vdocUriString);
-			return await commands.executeCommand<Hover[]>(
-				"vscode.executeHoverProvider",
-				vdocUri,
-				position
-			).then((hovers) => Array.isArray(hovers) && hovers.length ? hovers[0] : undefined);
+			return await commands
+				.executeCommand<Hover[]>("vscode.executeHoverProvider", vdocUri, position)
+				.then((hovers) => (Array.isArray(hovers) && hovers.length ? hovers[0] : undefined));
 		} else {
 			// Do not forward the request
 			return await next(document, position, token);
@@ -104,9 +111,9 @@ export const requestForwardingMiddleware: Middleware = {
 		const originalUri = document.uri.toString(true);
 		const language: number = await client.sendRequest("intersystems/embedded/languageAtPosition", {
 			textDocument: {
-				uri: originalUri
+				uri: originalUri,
 			},
-			position: position
+			position: position,
 		});
 
 		let vdocExt: string = "";
@@ -117,14 +124,14 @@ export const requestForwardingMiddleware: Middleware = {
 		if (vdocExt != "") {
 			// Forward the request
 			const vdocUriString = `isc-embedded-content://${language}:${position.line}-${position.character}/${encodeURIComponent(
-				originalUri
+				originalUri,
 			)}.${vdocExt}`;
 			const vdocUri = Uri.parse(vdocUriString);
 			return await commands.executeCommand<SignatureHelp>(
 				"vscode.executeSignatureHelpProvider",
 				vdocUri,
 				position,
-				context.triggerCharacter
+				context.triggerCharacter,
 			);
 		} else {
 			// Do not forward the request
@@ -142,14 +149,13 @@ export const requestForwardingMiddleware: Middleware = {
 			return [];
 		}
 		return await next(document, range, options, token);
-	}
+	},
 };
 
 export class ISCEmbeddedContentProvider implements TextDocumentContentProvider {
+	constructor() {}
 
-	constructor() { }
-
-	provideTextDocumentContent(uri: Uri): Promise<string> {
+	provideTextDocumentContent(uri: Uri): ProviderResult<string> {
 		// Get the isclexer language number and position from the URI authority
 		const language: number = Number(uri.authority.split(":")[0]);
 		const positionText = uri.authority.split(":")[1];
@@ -171,9 +177,8 @@ export class ISCEmbeddedContentProvider implements TextDocumentContentProvider {
 			return client.sendRequest("intersystems/embedded/isolateEmbeddedLanguage", {
 				uri: decodeURIComponent(originalUri),
 				language: language,
-				position: position
+				position: position,
 			});
 		}
 	}
-
 }
