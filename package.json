@@ -1807,6 +1807,7 @@
     "eslint": "^10.2.1",
     "merge-options": "^3.0.4",
     "node-loader": "^2.1.0",
+    "node-sarif-builder": "^4.1.0",
     "ovsx": "^0.10.11",
     "prettier": "^3.8.3",
     "rimraf": "^6.0.1",
