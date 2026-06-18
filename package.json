@@ -1,5 +1,5 @@
 {
-  "name": "language-server",
+  "name": "consistem-language-server",
   "displayName": "Consistem Language Server",
   "description": "A language server for InterSystems ObjectScript, based on the official project and maintained by Consistem.",
   "author": "InterSystems Corporation",
@@ -1818,7 +1818,7 @@
     "webpack-cli": "^7.0.2"
   },
   "extensionDependencies": [
-    "consistem-sistemas.vscode-objectscript"
+    "consistem-sistemas.consistem-vscode-objectscript"
   ],
   "prettier": {
     "useTabs": true,

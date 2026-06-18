@@ -8,6 +8,7 @@ shared.webpack.config.js
 **/tslint.json
 client/node_modules/**
 client/src/**
+client/vendor/**
 client/webpack.config.js
 server/node_modules/**
 server/src/**

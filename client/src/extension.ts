@@ -25,7 +25,7 @@ import {
 } from "vscode-languageclient/node";
 
 import { gt, lte, lt } from "semver";
-import * as serverManager from "@intersystems-community/intersystems-servermanager";
+import * as serverManager from "@consistem-sistemas/consistem-servermanager";
 
 import { ObjectScriptEvaluatableExpressionProvider } from "./evaluatableExpressionProvider";
 import {
@@ -91,7 +91,7 @@ type MakeRESTRequestParams = {
 
 export async function activate(context: ExtensionContext) {
 	// Get the main extension exported API
-	const objectScriptExt = extensions.getExtension("consistem-sistemas.vscode-objectscript")!;
+	const objectScriptExt = extensions.getExtension("consistem-sistemas.consistem-vscode-objectscript")!;
 	objectScriptApi = objectScriptExt.isActive ? objectScriptExt.exports : await objectScriptExt.activate();
 
 	// The server is implemented in node
@@ -164,7 +164,7 @@ export async function activate(context: ExtensionContext) {
 		wsFolderServerSpecs.clear();
 		client.sendNotification("intersystems/server/connectionChange");
 	});
-	const serverManagerExt = extensions.getExtension("consistem-sistemas.servermanager");
+	const serverManagerExt = extensions.getExtension("consistem-sistemas.consistem-servermanager");
 	if (serverManagerExt !== undefined) {
 		// The server manager extension is installed
 		serverManagerApi = serverManagerExt.isActive ? serverManagerExt.exports : await serverManagerExt.activate();
@@ -402,7 +402,7 @@ export async function activate(context: ExtensionContext) {
 			if (workspace.name === undefined) {
 				window
 					.showInformationMessage(
-						`For the best user experience, InterSystems recommends that you activate the default light theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.language-server). Activate now?`,
+						`For the best user experience, InterSystems recommends that you activate the default light theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.consistem-language-server). Activate now?`,
 						"Yes",
 						"Don't Ask Again",
 					)
@@ -417,7 +417,7 @@ export async function activate(context: ExtensionContext) {
 				// Only give the "Only This Workspace" option if a workspace is open
 				window
 					.showInformationMessage(
-						`For the best user experience, InterSystems recommends that you activate the default light theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.language-server). Activate now?`,
+						`For the best user experience, InterSystems recommends that you activate the default light theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.consistem-language-server). Activate now?`,
 						"Globally",
 						"Only This Workspace",
 						"Don't Ask Again",
@@ -436,7 +436,7 @@ export async function activate(context: ExtensionContext) {
 			if (workspace.name === undefined) {
 				window
 					.showInformationMessage(
-						`For the best user experience, InterSystems recommends that you activate the default dark theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.language-server). Activate now?`,
+						`For the best user experience, InterSystems recommends that you activate the default dark theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.consistem-language-server). Activate now?`,
 						"Yes",
 						"Don't Ask Again",
 					)
@@ -451,7 +451,7 @@ export async function activate(context: ExtensionContext) {
 				// Only give the "Only This Workspace" option if a workspace is open
 				window
 					.showInformationMessage(
-						`For the best user experience, InterSystems recommends that you activate the default dark theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.language-server). Activate now?`,
+						`For the best user experience, InterSystems recommends that you activate the default dark theme included with the [InterSystems Language Server extension](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.consistem-language-server). Activate now?`,
 						"Globally",
 						"Only This Workspace",
 						"Don't Ask Again",
