@@ -11,7 +11,7 @@
     "vscode-languageclient": "^9.0.1"
   },
   "devDependencies": {
-    "@consistem-sistemas/consistem-servermanager": "file:../../intersystems-servermanager/types",
+    "@consistem-sistemas/consistem-servermanager": "file:./vendor/consistem-servermanager",
     "@types/semver": "^7.7.0",
     "@types/vscode": "1.93.0"
   }
