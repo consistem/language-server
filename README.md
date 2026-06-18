@@ -104,7 +104,7 @@ This extension can be installed on the following platforms:
 
 ## Dependencies
 
-This extension depends on the [vscode-objectscript](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.vscode-objectscript) extension be downloaded and enabled.
+This extension depends on the [vscode-objectscript](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.consistem-vscode-objectscript) extension be downloaded and enabled.
 
 ## InterSystems Product Compatibility
 
