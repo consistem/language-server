@@ -4,6 +4,7 @@
 
 - `client/`: extensão do VS Code (Language Client). Código em `client/src/`, build em `client/out/`.
 - `server/`: servidor de linguagem (LSP). Código em `server/src/`, build em `server/out/`.
+- `common/`: tipos compartilhados entre client e server. Código em `common/src/`, build em `common/out/`.
 - `server/lib/`: binários do lexer nativo por plataforma (`*-isclexer.node`) e typings (`isclexer.node.d.ts`).
 - `themes/`: temas empacotados.
 - `images/`: assets de marketplace/README.
@@ -12,12 +13,12 @@
 
 Use Node.js 24 (mesma versão do CI).
 
-- `npm install`: Instala dependências na raiz e executa `postinstall` para instalar deps de `client/` e `server/`.
-- `npm run compile`: Build TypeScript (`tsc -b`) de `client/` + `server/`.
+- `npm install`: Instala dependências na raiz e executa `postinstall` para instalar deps de `client/`, `server/` e `common/`.
+- `npm run compile`: Build TypeScript (`tsc -b`) de `common/` + `client/` + `server/`.
 - `npm run watch`: Build incremental em modo watch.
 - `npm run webpack:dev`: Build webpack para desenvolvimento/debug local.
 - `npm run webpack`: Build webpack de produção (usado para empacotar).
-- `npm run clean`: Remove `client/out` e `server/out`.
+- `npm run clean`: Remove `client/out`, `server/out`, `common/out` e os arquivos `tsconfig.tsbuildinfo`.
 
 Nota do lexer nativo: `server/src/**` importa `server/lib/isclexer.node`, que é gitignored. Crie/atualize o arquivo localmente com:
 

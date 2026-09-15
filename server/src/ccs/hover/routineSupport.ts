@@ -44,8 +44,9 @@ export async function getRoutineHover(
 	} else {
 		const spanText = doc.getText(Range.create(startPos, position));
 		const computed = determineActiveParam(spanText);
-		if (routineDetails.signature.parameters.length > 0) {
-			activeIndex = Math.min(Math.max(computed ?? 0, 0), routineDetails.signature.parameters.length - 1);
+		const paramInfos = routineDetails.signature.parameters ?? [];
+		if (paramInfos.length > 0) {
+			activeIndex = Math.min(Math.max(computed ?? 0, 0), paramInfos.length - 1);
 		} else {
 			activeIndex = null;
 		}
