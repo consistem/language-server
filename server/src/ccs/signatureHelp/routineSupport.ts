@@ -309,14 +309,14 @@ export async function getRoutineSignatureDetails(
 
 export function buildRoutineDocumentation(
 	signature: SignatureInformation,
-	activeIndex: number | null,
+	activeIndex: number | null | undefined,
 	options?: {
 		context?: "hover" | "signature";
 		boldParameter?: boolean;
 		// opcional: mostrar o cabeçalho (bloco de código) no hover
 		showHeaderInHover?: boolean;
 	},
-): MarkupContent | undefined {
+): MarkupContent {
 	const paramInfos = signature.parameters ?? [];
 	const isHover = options?.context === "hover";
 	const isSignature = options?.context === "signature";

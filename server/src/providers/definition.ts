@@ -28,7 +28,11 @@ import * as ld from "../utils/languageDefinitions";
  */
 const definitionTargetRangeMaxLines: number = 10;
 
-/** Return a `LocationLink` for class member `memberName` in class `cls` */
+/** Return a `LocationLink` for class member `memberName` in class `cls`
+ *
+ * This function queries `server` to find the source code of `cls` and locates
+ * the definition of `memberName` within the source code.
+ */
 async function classMemberLocationLink(
 	uri: string,
 	cls: string,
@@ -210,7 +214,7 @@ function findMemberInCurrentClass(
 	}
 }
 
-export async function onDefinition(params: TextDocumentPositionParams) {
+export async function onDefinition(params: TextDocumentPositionParams): Promise<LocationLink[] | null | undefined> {
 	const doc = documents.get(params.textDocument.uri);
 	if (doc === undefined) {
 		return null;
@@ -219,7 +223,10 @@ export async function onDefinition(params: TextDocumentPositionParams) {
 	if (parsed === undefined) {
 		return null;
 	}
-	const server: ServerSpec = await getServerSpec(params.textDocument.uri);
+	const server = await getServerSpec(params.textDocument.uri);
+	if (!server) {
+		return null;
+	}
 
 	if (parsed[params.position.line] === undefined) {
 		// This is the blank last line of the file
@@ -370,7 +377,7 @@ export async function onDefinition(params: TextDocumentPositionParams) {
 						mode: maccon.mode,
 					};
 					const respdata = await makeRESTRequest("POST", 2, "/action/getmacrolocation", server, inputdata);
-					if (respdata !== undefined && respdata.data.result.content.document !== "") {
+					if (respdata?.data?.result?.content?.document) {
 						// The macro was found in a document
 						const lastdot = respdata.data.result.content.document.lastIndexOf(".");
 						const filename = respdata.data.result.content.document.substring(0, lastdot);
@@ -398,6 +405,32 @@ export async function onDefinition(params: TextDocumentPositionParams) {
 						}
 					}
 				}
+			} else if (
+				parsed[params.position.line][i].l == ld.cls_langindex &&
+				i == 1 &&
+				isClassMember(
+					doc
+						.getText(
+							Range.create(
+								params.position.line,
+								parsed[params.position.line][0].p,
+								params.position.line,
+								parsed[params.position.line][0].p + parsed[params.position.line][0].c,
+							),
+						)
+						.toLowerCase(),
+				)
+			) {
+				// This is a class member definition
+				const range = findFullRange(params.position.line, parsed, i, symbolstart, symbolend);
+				return findMemberInCurrentClass(
+					doc,
+					parsed,
+					params.textDocument.uri,
+					doc.getText(range),
+					"Method|ClassMethod|ClientMethod|Property|Relationship|Parameter|Projection|Query|Storage|Trigger|XData|ForeignKey|Index",
+					range,
+				);
 			} else if (
 				parsed[params.position.line][i].l == ld.cos_langindex &&
 				(parsed[params.position.line][i].s == ld.cos_prop_attrindex ||
@@ -429,7 +462,12 @@ export async function onDefinition(params: TextDocumentPositionParams) {
 				}
 
 				let membercontext: { baseclass: string; context?: string };
-				if (parsed[params.position.line][i].s != ld.cos_instvar_attrindex) {
+				if (parsed[params.position.line][i].s == ld.cos_instvar_attrindex) {
+					membercontext = {
+						baseclass: thisclass,
+						context: "",
+					};
+				} else {
 					// Find the dot token
 					let dottkn = 0;
 					for (let tkn = 0; tkn < parsed[params.position.line].length; tkn++) {
@@ -441,11 +479,6 @@ export async function onDefinition(params: TextDocumentPositionParams) {
 
 					// Get the base class that this member is in
 					membercontext = await getClassMemberContext(doc, parsed, dottkn, params.position.line, server);
-				} else {
-					membercontext = {
-						baseclass: thisclass,
-						context: "",
-					};
 				}
 				if (membercontext.baseclass === "") {
 					// If we couldn't determine the class, don't return anything
@@ -621,7 +654,7 @@ export async function onDefinition(params: TextDocumentPositionParams) {
 					// Check if this routine is a MAC or INT
 					const respdata = await makeRESTRequest("POST", 1, "/action/index", server, [word + ".int"]);
 					if (
-						respdata !== undefined &&
+						Array.isArray(respdata?.data?.result?.content) &&
 						respdata.data.result.content.length > 0 &&
 						respdata.data.result.content[0].status === ""
 					) {
@@ -744,7 +777,7 @@ export async function onDefinition(params: TextDocumentPositionParams) {
 					// Check if this routine is a MAC or INT
 					const indexrespdata = await makeRESTRequest("POST", 1, "/action/index", server, [routine + ".int"]);
 					if (
-						indexrespdata !== undefined &&
+						Array.isArray(indexrespdata?.data?.result?.content) &&
 						indexrespdata.data.result.content.length > 0 &&
 						indexrespdata.data.result.content[0].status === ""
 					) {

@@ -322,7 +322,7 @@ export async function onDocumentSymbol(params: DocumentSymbolParams) {
 					labelrange.start.line >= result[result.length - 1].range.start.line &&
 					labelrange.start.line <= result[result.length - 1].range.end.line;
 
-				let firstbrace: [number, number] | undefined = undefined;
+				let firstbrace: [number, number] | undefined;
 				if (!inProcedureBlock) {
 					// Check if this label is a procedure block
 					firstbrace = labelIsProcedureBlock(doc, parsed, line);

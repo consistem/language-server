@@ -3,7 +3,14 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
     {
-        ignores: ["**/vscode.d.ts", "**/vscode.proposed.d.ts", "client/out/**", "server/out/**", "**/*.config.{mjs,js}"],
+        ignores: [
+            "**/vscode.d.ts",
+            "**/vscode.proposed.d.ts",
+            "client/out/**",
+            "server/out/**",
+            "common/out/**",
+            "**/*.config.{mjs,js}",
+        ],
     },
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
@@ -14,7 +21,7 @@ export default tseslint.config(
         },
     },
     {
-        files: ["scripts/**/*.js"],
+        files: ["scripts/**/*.js", "client/vendor/**/*.js"],
         languageOptions: {
             globals: {
                 require: "readonly",

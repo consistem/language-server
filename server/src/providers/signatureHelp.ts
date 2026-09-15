@@ -22,7 +22,7 @@ import {
 	quoteUDLIdentifier,
 	determineActiveParam,
 } from "../utils/functions";
-import { ServerSpec, SignatureHelpDocCache, SignatureHelpMacroContext } from "../utils/types";
+import { SignatureHelpDocCache, SignatureHelpMacroContext } from "../utils/types";
 import { documents } from "../utils/variables";
 import * as ld from "../utils/languageDefinitions";
 import { buildRoutineDocumentation, getRoutineSignatureDetails } from "../ccs/signatureHelp/routineSupport";
@@ -35,12 +35,12 @@ let signatureHelpMacroCache: SignatureHelpMacroContext;
 /**
  * Cache of the documentation content sent for the last triggered SignatureHelp.
  */
-let signatureHelpDocumentationCache: SignatureHelpDocCache | undefined = undefined;
+let signatureHelpDocumentationCache: SignatureHelpDocCache | undefined;
 
 /**
  * The start position of the active SignatureHelp.
  */
-let signatureHelpStartPosition: Position | undefined = undefined;
+let signatureHelpStartPosition: Position | undefined;
 
 /** Placeholder for the Markdown emphasis characters before an argument. */
 const emphasizePrefix: string = "%%%%%";
@@ -171,7 +171,10 @@ export async function onSignatureHelp(params: SignatureHelpParams): Promise<Sign
 	if (parsed === undefined) {
 		return null;
 	}
-	const server: ServerSpec = await getServerSpec(params.textDocument.uri);
+	const server = await getServerSpec(params.textDocument.uri);
+	if (!server) {
+		return null;
+	}
 	const settings = await getLanguageServerSettings(params.textDocument.uri);
 
 	if (params.context.triggerKind == SignatureHelpTriggerKind.Invoked) {
@@ -202,7 +205,7 @@ export async function onSignatureHelp(params: SignatureHelpParams): Promise<Sign
 			1
 	) {
 		if (params.context.activeSignatureHelp) {
-			params.context.activeSignatureHelp.signatures[0].documentation = signatureHelpDocumentationCache?.doc;
+			params.context.activeSignatureHelp.signatures[0].documentation = signatureHelpDocumentationCache!.doc;
 			return params.context.activeSignatureHelp;
 		} else {
 			return null;
@@ -252,7 +255,7 @@ export async function onSignatureHelp(params: SignatureHelpParams): Promise<Sign
 					const paramInfos = sig.parameters ?? [];
 					const boundedIndex = paramInfos.length
 						? Math.min(Math.max(params.context.activeSignatureHelp.activeParameter ?? 0, 0), paramInfos.length - 1)
-						: null;
+						: undefined;
 					params.context.activeSignatureHelp.activeParameter = boundedIndex;
 					const docContent = buildRoutineDocumentation(sig, boundedIndex, { context: "signature" });
 					signatureHelpDocumentationCache.doc = docContent;
@@ -506,7 +509,7 @@ export async function onSignatureHelp(params: SignatureHelpParams): Promise<Sign
 				server,
 			);
 			if (routineDetails !== null) {
-				const initialActive = routineDetails.signature.parameters.length ? 0 : null;
+				const initialActive = routineDetails.signature.parameters?.length ? 0 : undefined;
 				const initialDoc = buildRoutineDocumentation(routineDetails.signature, initialActive, { context: "signature" });
 				signatureHelpDocumentationCache = { type: "routine", doc: initialDoc };
 				routineDetails.signature.documentation = initialDoc;
@@ -782,9 +785,10 @@ export async function onSignatureHelp(params: SignatureHelpParams): Promise<Sign
 					const activeParamValue = beforeStart
 						? 0
 						: determineActiveParam(doc.getText(Range.create(startPos, params.position)));
-					const boundedIndex = routineDetails.signature.parameters.length
-						? Math.min(Math.max(activeParamValue ?? 0, 0), routineDetails.signature.parameters.length - 1)
-						: null;
+					const routineParams = routineDetails.signature.parameters ?? [];
+					const boundedIndex = routineParams.length
+						? Math.min(Math.max(activeParamValue ?? 0, 0), routineParams.length - 1)
+						: undefined;
 					const docContent = buildRoutineDocumentation(routineDetails.signature, boundedIndex, {
 						context: "signature",
 					});

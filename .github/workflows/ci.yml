@@ -75,7 +75,7 @@ jobs:
     if: success() && github.event_name == 'push'
     steps:
       - name: Download metadata
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: meta
           path: .
@@ -85,12 +85,12 @@ jobs:
           set -x
           echo "version=`cat meta.version`" >> $GITHUB_OUTPUT
       - name: Download packages
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
          pattern: '**/*.vsix'
       - name: Create Release
         id: create-release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.set-version.outputs.version }}
           prerelease: ${{ github.event_name != 'release' }}
@@ -101,31 +101,15 @@ jobs:
     needs: build
     if: success() && github.event_name == 'release'
     steps:
-      - name: Use Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-      - run: npm install -g @vscode/vsce
       - name: Download packages
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
       - name: Attach packages to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: '**/*.vsix'
           body: See CHANGELOG for details
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish to VS Code Marketplace
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
-        if: env.VSCE_PAT != null
-        run: vsce publish --packagePath $(find . -iname "*.vsix" -type f)
-      - name: Publish to Open VSX Registry
-        env:
-          OVSX_PAT: ${{ secrets.OVSX_TOKEN }}
-        if: env.OVSX_PAT != null
-        timeout-minutes: 5
-        run: find . -iname "*.vsix" -type f -exec npx ovsx publish {} \;
   bump_version:
     runs-on: ubuntu-latest
     needs: [build, publish]
@@ -136,7 +120,7 @@ jobs:
         with:
           ref: master
       - name: Download metadata
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: meta
           path: .
