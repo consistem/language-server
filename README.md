@@ -1,99 +1,188 @@
 <p align="center">
-  <img alt="Consistem" src="https://raw.githubusercontent.com/consistem/vscode-objectscript/master/images/logo-consistem-horizontal.png" width="280" />
+  <img alt="Consistem" src="https://raw.githubusercontent.com/consistem/language-server/master/images/logo-consistem-horizontal.png" width="280" />
 </p>
 
 # Consistem Language Server
 
-This is a [LSP](https://microsoft.github.io/language-server-protocol/) compliant language server for [InterSystems](http://www.intersystems.com/our-products/) ObjectScript.
-It is powered by **Node.js**, written primarily in **TypeScript**, and designed to integrate seamlessly with editors that support the [LSP standard](https://microsoft.github.io/language-server-protocol/).
+Servidor de linguagem compatível com o padrão [LSP](https://microsoft.github.io/language-server-protocol/) para
+[InterSystems](http://www.intersystems.com/our-products/) ObjectScript, executado em **Node.js** e escrito
+principalmente em **TypeScript**.
 
-## Installation & usage
+Este repositório é o **fork mantido pela [Consistem&reg;](https://consistem.com.br/)** do projeto oficial
+[`intersystems/language-server`](https://github.com/intersystems/language-server). Ele preserva todos os recursos do
+projeto original e acrescenta integrações, ajustes e padrões internos voltados ao ecossistema de desenvolvimento do
+Consistem ERP.
 
-> **Note:** The best way to install and use this extension is by installing the [InterSystems ObjectScript Extension Pack](https://marketplace.visualstudio.com/items?itemName=intersystems-community.objectscript-pack) and following the [documentation here](https://docs.intersystems.com/components/csp/docbook/DocBook.UI.Page.cls?KEY=GVSCO).
+## Documentação oficial
 
-## About this fork
+A documentação de uso (instalação, configuração, atalhos e funcionalidades do ambiente) fica na Cuka:
 
-This project is a fork of the official [`intersystems/language-server`](https://github.com/intersystems/language-server) repository.
+**[VS Code - Ambiente de Desenvolvimento Consistem](https://cuka.consistem.com.br/doc/vs-code-ambiente-de-desenvolvimento-consistem-6rRtIWzvzz)**
 
-Originally maintained by [InterSystems&reg;](http://www.intersystems.com), this fork is maintained by [Consistem&reg;](https://consistem.com.br/).
+Atalhos úteis:
 
-It preserves all features of the upstream project and adds integrations, adjustments, and internal standards adopted by Consistem,
-with a focus on meeting the specific needs of our development ecosystem.
+- [Configuração do Ambiente de Desenvolvimento Consistem](https://cuka.consistem.com.br/doc/configuracao-do-ambiente-de-desenvolvimento-consistem-iqzsJjpwG5)
+- [Configuração Server-Side](https://cuka.consistem.com.br/doc/configuracao-server-side-H7y5eAuSgF)
+- [Funcionalidades implementadas pela Consistem](https://cuka.consistem.com.br/doc/conheca-as-funcionalidades-implementadas-pela-consistem-522jh8dn92)
+- [Resolução de Erros](https://cuka.consistem.com.br/doc/resolucao-de-erros-uFVNgLxrjz)
 
-## Features
+Este README cobre o **repositório** (o que o fork muda, como compilar e empacotar). Para o passo a passo de uso diário,
+siga a documentação acima.
 
-- [Semantic token](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide)-based coloring for InterSystems ObjectScript classes, routines and CSP files, with support for embedded languages like SQL, Python, HTML, XML, Java, JavaScript and CSS.
-- Hover information for ObjectScript commands, system functions, system variables, classes, class members, macros, preprocessor directives, class keywords, Parameter types, Storage definition keywords, and embedded SQL tables, fields and class methods and queries invoked as SQL procedures.
-- [Go to definition](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition) for ObjectScript classes, class members, macros, routines, routine labels, class name parameters, `##super()`, and embedded SQL tables, fields and class methods and queries invoked as SQL procedures.
-- Code completion for ObjectScript classes, class members, system functions, system variables, macros, include files, package imports, preprocessor directives, class keywords, class keyword values, class Parameter types, Storage definition keywords, routines and globals. Code completion for properties referenced using instance variable syntax (`i%PropertyName`) must be triggered manually using `Ctrl-Space` with the cursor immediately after the `i%`.
-- Code completion for XML Element names, Attribute names and Attribute values within XData blocks that have the XMLNamespace keyword set to a URL that corresponds to a Studio Assist Schema (SASchema).
-- Signature help for ObjectScript methods and macros that accept arguments.
-- Document symbols for ObjectScript classes, routines and include files.
-- Full document and range-based code formatting for the following:
-  - Normalize the case of ObjectScript commands, system functions and system variables.
-  - Normalize the usage of short or long versions of ObjectScript commands, system functions and system variables.
-  - Expand short class names to include packages (off by default)
-- Code linting for ObjectScript classes, routines and CSP files that checks for the following:
-  - Syntax errors, including for embedded languages.
-  - References to local variables that may be undefined.
-  - Classes and routines that don't exist in the database.
-  - Invalid class Parameter types.
-  - Mismatches between declared class Parameter types and the assigned value.
-  - Classes, Methods, Parameters and Properties that are [Deprecated](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=ROBJ_method_deprecated).
-  - `$ZUTIL` functions that [are deprecated or have been superseded](https://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=RCOS_replacements).
-  - [SQL reserved words](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=RSQL_reservedwords) used in class and property names of persistent classes.
-  - The value of the DEFAULTGLOBAL Parameter in a persistent class is not a valid global name prefixed by a caret.
-- [Folding Ranges](https://code.visualstudio.com/docs/editor/codebasics#_folding) for the following:
-  - ObjectScript code blocks (If/ElseIf/Else, Try/Catch, For, While, etc.)
-  - Class members
-  - ObjectScript routine labels
-  - Class descriptions
-  - ObjectScript documentation comments (/// in first column)
-  - XML tags in XData blocks
-  - Storage XML tags
-  - JSON in XData blocks
-  - %DynamicObject and %DynamicArray
-  - ObjectScript preprocessor code blocks
-  - Multi-line macro definitions
-  - Dotted Do blocks
-  - Embedded code blocks (SQL, HTML, JavaScript)
-  - Region markers:
-    - In ObjectScript: `#;#region` or `//#region` to start and `#;#endregion` or `//#endregion` to end
-    - In class comments: `//#region` to start and `//#endregion` to end
-- [Symbol Renaming](https://code.visualstudio.com/docs/editor/refactoring#_rename-symbol) for ObjectScript local variables and method arguments within class definitions.
-- [Go to type definition](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-type-definition) for ObjectScript methods, properties, method arguments and variables.
-- Go to declaration for ObjectScript method arguments, variables declared with `#Dim` and variables in the [PublicList](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=ROBJ_method_publiclist).
-- Command to override inherited class members. To invoke the command, right-click in a blank line of a class definition body and select the `Override Class Members` row in the menu that appears. The command will insert the selected class member definition(s) at the cursor position where the command was invoked.
-- [Evaluatable Expression Provider](https://code.visualstudio.com/api/references/vscode-api#EvaluatableExpressionProvider) that allows the debug hover to evaluate the following:
-  - Globals
-  - Class parameters
-  - Method parameters
-  - Private variables
-  - Public variables
-  - [System variables](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=RCOS_VARIABLES)
-- [Document Links](https://code.visualstudio.com/api/references/vscode-api#DocumentLink) for [CLASS, METHOD, PROPERTY and QUERY HTML tags](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=GOBJ_classes#GOBJ_classdoc_html) and `##class()` syntax in class documentation comments.
-- [QuickFix CodeActions](https://code.visualstudio.com/docs/editor/refactoring#_code-actions-quick-fixes-and-refactorings) that resolve the following Diagnostics:
-  - [Unqualified class references](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=GOBJ_packages#GOBJ_packages_in_classname) in a class definition that don't exist in the database:
-    - Select a package containing the unqualified class name to import.
-  - Invalid class Parameter types and mismatches between declared class Parameter types and the assigned value:
-    - Remove the invalid class Parameter type.
-    - Select a correct class Parameter type to replace the invalid one.
-  - `$ZUTIL` functions that have been superseded by ClassMethods:
-    - Replace the `$ZUTIL` function call with the appropriate ClassMethod.
-- Intellisense for the following embedded languages (provided by [request forwarding](https://code.visualstudio.com/api/language-extensions/embedded-languages#request-forwarding)):
-  - Hover and code completion for HTML tags and CSS embedded in CSP/CSR files, HTML embedded in ObjectScript using the `&html` directive and CSS embedded in XML XData blocks.
-  - Hover, code completion and signature help for JavaScript methods in ObjectScript classes and JavaScript embedded in CSP using `<script>` tags or embedded in ObjectScript using the `&js` directive.
-- [Code refactoring CodeActions](https://code.visualstudio.com/docs/editor/refactoring#_code-actions-quick-fixes-and-refactorings) for the following:
-  - Wrapping a block of ObjectScript code in a [Try/Catch block](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=ATRYCATCHFAQ).
+## Instalação
+
+> **Importante:** as extensões da Consistem **não são publicadas no Visual Studio Marketplace**. A instalação é feita
+> a partir do arquivo `.vsix`.
+
+O ambiente completo depende de quatro extensões, todas em versão Consistem:
+
+| Extensão                        | Papel                                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------------------- |
+| `consistem-vscode-objectscript` | Integração com o servidor IRIS (conexão, compilação, server-side) — **dependência obrigatória** |
+| `consistem-servermanager`       | Cadastro e autenticação dos servidores                                                        |
+| `consistem-language-server`     | Este projeto: realce semântico, IntelliSense, diagnósticos e formatação                       |
+| `consistem-tools`               | Ferramentas internas (geradores, análise de global, pesquisa de fontes)                       |
+
+### Instalando o pacote interno (recomendado)
+
+1. No VS Code, abra a aba de extensões e use **Install from VSIX...**
+2. Selecione os arquivos em `C:\workspacecsw\config\vscode-workspace\Extensões`
+
+O passo a passo detalhado (perfil do VS Code, conexão com o IRIS, workspace e credenciais) está em
+[Configuração do Ambiente de Desenvolvimento Consistem](https://cuka.consistem.com.br/doc/configuracao-do-ambiente-de-desenvolvimento-consistem-iqzsJjpwG5).
+
+### Instalando a partir das releases do GitHub
+
+Cada build publica um `.vsix` por plataforma em
+[Releases](https://github.com/consistem/language-server/releases). Baixe o arquivo correspondente ao seu
+sistema/arquitetura (ex.: `consistem-language-server-<versão>-win32-x64.vsix`) e instale via **Install from VSIX...**.
+
+## O que este fork adiciona
+
+As customizações da Consistem ficam concentradas em `client/src/ccs/**` e `server/src/ccs/**`, com pequenos "ganchos"
+no núcleo, para manter os merges com o upstream simples.
+
+- **Signature help para rotinas e labels.** Ao digitar `$$Label^ROTINA(` ou `do Label^ROTINA(`, a extensão lê o fonte
+  da rotina (no documento atual ou no servidor, via Atelier API), localiza o label e mostra a assinatura com o nome
+  real do parâmetro na origem. Cobre o padrão de chamadas do ERP, que o upstream só oferece para métodos de classe.
+- **Hover com o parâmetro na origem.** Ao passar o mouse sobre um argumento de uma chamada de rotina ou de método
+  (`##class(...).Metodo(...)`, inclusive `%New` resolvendo para `%OnNew`), é exibido a qual parâmetro da definição
+  aquele argumento corresponde.
+- **Controle da formatação automática.** Evita que a formatação de documento seja disparada em salvamentos e
+  compilações automáticas, preservando o formato do fonte; a formatação manual
+  (`editor.action.formatDocument`) continua funcionando normalmente.
+- **Dependências repactuadas.** O cliente consome `@consistem-sistemas/consistem-servermanager` (em `client/vendor/`)
+  e declara dependência da extensão `consistem-sistemas.consistem-vscode-objectscript`.
+- **Empacotamento multiplataforma próprio.** `scripts/select-isclexer.js` seleciona o lexer nativo por SO/arquitetura
+  e `scripts/package-vsce.js` gera o `.vsix` por _target_, permitindo cross-build.
+- **Sincronização automática com o upstream.** O workflow `.github/workflows/sync-upstream.yml` roda diariamente
+  (03:00 UTC) e abre PR de `bot/sync-upstream-master` para `master`, sem escrita direta na branch protegida.
+
+## Recursos
+
+- Colorização baseada em [tokens semânticos](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide)
+  para classes, rotinas e arquivos CSP do InterSystems ObjectScript, com suporte a linguagens embutidas como SQL,
+  Python, HTML, XML, Java, JavaScript e CSS.
+- Informações em _hover_ para comandos ObjectScript, funções e variáveis de sistema, classes, membros de classe,
+  macros, diretivas de pré-processador, _keywords_ de classe, tipos de Parameter, _keywords_ de definição de Storage e
+  tabelas, campos, métodos e _queries_ de SQL embutido invocados como _procedures_.
+- [Ir para definição](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition) para classes, membros
+  de classe, macros, rotinas, labels de rotina, parâmetros de nome de classe, `##super()` e tabelas, campos, métodos e
+  _queries_ de SQL embutido.
+- _Code completion_ para classes, membros de classe, funções e variáveis de sistema, macros, arquivos include, imports
+  de pacote, diretivas de pré-processador, _keywords_ de classe e seus valores, tipos de Parameter, _keywords_ de
+  Storage, rotinas e globais. Para propriedades referenciadas por sintaxe de variável de instância
+  (`i%NomeDaPropriedade`), o _completion_ precisa ser acionado manualmente com `Ctrl+Space`, com o cursor imediatamente
+  após o `i%`.
+- _Code completion_ para nomes de elementos, nomes de atributos e valores de atributos XML dentro de blocos XData cuja
+  _keyword_ XMLNamespace aponta para uma URL correspondente a um Studio Assist Schema (SASchema).
+- _Signature help_ para métodos e macros que aceitam argumentos.
+- Símbolos de documento para classes, rotinas e arquivos include.
+- Formatação de documento completo ou por intervalo, que permite:
+  - Normalizar a caixa de comandos, funções e variáveis de sistema.
+  - Normalizar o uso da forma curta ou longa de comandos, funções e variáveis de sistema.
+  - Expandir nomes curtos de classe para incluir o pacote (desativado por padrão).
+- _Linting_ para classes, rotinas e arquivos CSP, verificando:
+  - Erros de sintaxe, inclusive em linguagens embutidas.
+  - Referências a variáveis locais possivelmente indefinidas.
+  - Classes e rotinas inexistentes no banco de dados.
+  - Tipos inválidos de Parameter de classe.
+  - Divergências entre o tipo declarado do Parameter e o valor atribuído.
+  - Classes, Métodos, Parameters e Propriedades marcados como
+    [Deprecated](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=ROBJ_method_deprecated).
+  - Funções `$ZUTIL` [obsoletas ou substituídas](https://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=RCOS_replacements).
+  - [Palavras reservadas de SQL](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=RSQL_reservedwords)
+    usadas em nomes de classe e de propriedade de classes persistentes.
+  - Valor do Parameter DEFAULTGLOBAL, em classe persistente, que não seja um nome de global válido prefixado por acento
+    circunflexo.
+- [Regiões de dobra](https://code.visualstudio.com/docs/editor/codebasics#_folding) para:
+  - Blocos de código ObjectScript (If/ElseIf/Else, Try/Catch, For, While etc.)
+  - Membros de classe
+  - Labels de rotina
+  - Descrições de classe
+  - Comentários de documentação (`///` na primeira coluna)
+  - Tags XML em blocos XData
+  - Tags XML de Storage
+  - JSON em blocos XData
+  - %DynamicObject e %DynamicArray
+  - Blocos de pré-processador
+  - Definições de macro multilinha
+  - Blocos Do com ponto
+  - Blocos de código embutido (SQL, HTML, JavaScript)
+  - Marcadores de região:
+    - Em ObjectScript: `#;#region` ou `//#region` para abrir e `#;#endregion` ou `//#endregion` para fechar
+    - Em comentários de classe: `//#region` para abrir e `//#endregion` para fechar
+- [Renomeação de símbolos](https://code.visualstudio.com/docs/editor/refactoring#_rename-symbol) para variáveis locais
+  e argumentos de método dentro de definições de classe.
+- [Ir para definição de tipo](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-type-definition) para
+  métodos, propriedades, argumentos de método e variáveis.
+- Ir para declaração de argumentos de método, variáveis declaradas com `#Dim` e variáveis na
+  [PublicList](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=ROBJ_method_publiclist).
+- Comando para sobrescrever membros herdados. Para acioná-lo, clique com o botão direito em uma linha em branco do
+  corpo de uma definição de classe e selecione **Override Class Members**. As definições selecionadas são inseridas na
+  posição do cursor.
+- [Evaluatable Expression Provider](https://code.visualstudio.com/api/references/vscode-api#EvaluatableExpressionProvider),
+  que permite ao _hover_ de depuração avaliar:
+  - Globais
+  - Parameters de classe
+  - Parâmetros de método
+  - Variáveis privadas
+  - Variáveis públicas
+  - [Variáveis de sistema](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=RCOS_VARIABLES)
+- [Document Links](https://code.visualstudio.com/api/references/vscode-api#DocumentLink) para as
+  [tags HTML CLASS, METHOD, PROPERTY e QUERY](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=GOBJ_classes#GOBJ_classdoc_html)
+  e para a sintaxe `##class()` em comentários de documentação.
+- [Quick Fixes](https://code.visualstudio.com/docs/editor/refactoring#_code-actions-quick-fixes-and-refactorings) que
+  resolvem os seguintes diagnósticos:
+  - [Referências de classe não qualificadas](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=GOBJ_packages#GOBJ_packages_in_classname)
+    que não existem no banco de dados:
+    - Selecionar um pacote que contenha o nome não qualificado para importar.
+  - Tipos inválidos de Parameter e divergências entre tipo declarado e valor atribuído:
+    - Remover o tipo inválido.
+    - Selecionar um tipo válido para substituí-lo.
+  - Funções `$ZUTIL` substituídas por ClassMethods:
+    - Substituir a chamada `$ZUTIL` pelo ClassMethod correspondente.
+- IntelliSense para as linguagens embutidas abaixo (via
+  [request forwarding](https://code.visualstudio.com/api/language-extensions/embedded-languages#request-forwarding)):
+  - _Hover_ e _code completion_ para tags HTML e CSS embutidos em arquivos CSP/CSR, HTML embutido em ObjectScript pela
+    diretiva `&html` e CSS embutido em blocos XData de XML.
+  - _Hover_, _code completion_ e _signature help_ para métodos JavaScript em classes, JavaScript embutido em CSP por
+    tags `<script>` e JavaScript embutido em ObjectScript pela diretiva `&js`.
+- [Refatorações](https://code.visualstudio.com/docs/editor/refactoring#_code-actions-quick-fixes-and-refactorings):
+  - Envolver um bloco de código em [Try/Catch](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=ATRYCATCHFAQ).
+
     ![](images/TryCatch.gif)
-  - Extracting a block of ObjectScript code from an existing method to a new method.
+
+  - Extrair um bloco de código de um método existente para um novo método.
+
     ![](images/ExtractMethod.gif)
-- [Type Hierarchy Provider](https://code.visualstudio.com/api/references/vscode-api#TypeHierarchyProvider) for ObjectScript classes to show subclasses and superclasses in a hierarchical tree view:
+
+- [Type Hierarchy Provider](https://code.visualstudio.com/api/references/vscode-api#TypeHierarchyProvider) para exibir
+  subclasses e superclasses em árvore:
+
   ![](images/TypeHierarchy.gif)
 
-## Supported Platforms
-
-This extension can be installed on the following platforms:
+## Plataformas suportadas
 
 |              |                |
 | ------------ | -------------- |
@@ -102,48 +191,67 @@ This extension can be installed on the following platforms:
 | `linux-x64`  | `linux-arm64`  |
 | `win32-x64`  | `win32-arm64`  |
 
-## Dependencies
+## Compatibilidade com produtos InterSystems
 
-This extension depends on the [vscode-objectscript](https://marketplace.visualstudio.com/items?itemName=consistem-sistemas.consistem-vscode-objectscript) extension be downloaded and enabled.
+São suportados todos os produtos InterSystems que incluem as Atelier APIs (Caché/Ensemble a partir de 2016.2 e todas as
+versões do InterSystems IRIS).
 
-## InterSystems Product Compatibility
+## Notas de configuração
 
-All InterSystems products that include the Atelier APIs (Caché/Ensemble from 2016.2 onward, all versions of InterSystems IRIS) are supported.
-
-## Setup Notes
-
-If the configured user for connection to a server does NOT have the `%All` Role, execute the following query on the server to enable all of this extension's features. This is not necessary when connecting to InterSystems IRIS version 2021.1.3+, 2022.1.2+, or 2022.2+.
+Se o usuário configurado para a conexão **não** tiver a _role_ `%All`, execute a consulta abaixo no servidor para
+habilitar todos os recursos da extensão. Isso não é necessário ao conectar em InterSystems IRIS 2021.1.3+, 2022.1.2+ ou
+2022.2+.
 
 ```SQL
 GRANT SELECT ON SCHEMA %Dictionary TO %Developer
 ```
 
-## Configuration Settings
+## Configurações da extensão
 
-Visit the [Settings Reference page](https://docs.intersystems.com/components/csp/docbook/DocBook.UI.Page.cls?KEY=GVSCO_settings#GVSCO_settings_langserv) of the documentation for a list of all configuration settings provided by this extension. Changes to these settings can be made in the [Visual Studio Code user settings editor](https://code.visualstudio.com/docs/getstarted/settings#_edit-settings).
+A lista completa das configurações está na
+[Settings Reference](https://docs.intersystems.com/components/csp/docbook/DocBook.UI.Page.cls?KEY=GVSCO_settings#GVSCO_settings_langserv)
+da documentação da InterSystems. As alterações podem ser feitas pelo
+[editor de configurações do VS Code](https://code.visualstudio.com/docs/getstarted/settings#_edit-settings).
 
-## Syntax Color Customization
+## Personalização das cores de sintaxe
 
-This extension is packaged with four default themes, two light and two dark, that are [Web Content Accessibility Guidelines](https://www.w3.org/WAI/standards-guidelines/wcag/) (WCAG) 2.0 AAA compliant when editing InterSystems files. They have been developed with usability and accessibility in mind and are recommended for all users. Users may also use any VS Code theme downloaded from the marketplace or included by default. While the coloring provided by those themes will be syntactically correct, not all themes provide support for advanced features, such as coloring method arguments differently than local variables. If you wish to customize the colors assigned to InterSystems semantic tokens, there are two approaches, which are detailed below.
+A extensão acompanha quatro temas padrão — dois claros e dois escuros — em conformidade com o nível AAA das
+[Web Content Accessibility Guidelines](https://www.w3.org/WAI/standards-guidelines/wcag/) (WCAG) 2.0 na edição de
+arquivos InterSystems. Eles foram desenvolvidos com foco em usabilidade e acessibilidade e são recomendados para todos
+os usuários.
 
-### Custom Styling Rules
+Também é possível usar qualquer tema do Marketplace ou nativo do VS Code. A coloração continuará sintaticamente
+correta, mas nem todo tema dá suporte a recursos avançados, como colorir argumentos de método de forma diferente de
+variáveis locais. Para customizar as cores atribuídas aos tokens semânticos, há duas abordagens.
 
-To customize the colors for one or more of these semantic tokens, add the [editor.semanticTokenColorCustomizations code block](https://code.visualstudio.com/docs/getstarted/themes#_editor-semantic-highlighting) to your user or workspace [settings.json](https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations) file. For example:
+> A Consistem mantém um conjunto de cores customizadas documentado em
+> [Configuração de Cores customizadas](https://cuka.consistem.com.br/doc/configuracao-do-ambiente-de-desenvolvimento-consistem-iqzsJjpwG5#h-configuracao-de-cores-customizadas).
+
+### Regras de estilo customizadas
+
+Para customizar as cores de um ou mais tokens semânticos, adicione o bloco
+[editor.semanticTokenColorCustomizations](https://code.visualstudio.com/docs/getstarted/themes#_editor-semantic-highlighting)
+ao seu [settings.json](https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations) de usuário ou de
+workspace. Por exemplo:
 
 ```json
 "editor.semanticTokenColorCustomizations": {
-    "enabled": true, // enable for all themes, but see note below
+    "enabled": true, // habilita para todos os temas, mas veja a observação abaixo
     "rules": {
         "ISC_Error":{"foreground":"#F44747","fontStyle":"bold"}
     }
 }
 ```
 
-Note that setting `"enabled": false` in the object shown above does not merely disable the rules within the object. Instead it disables semantic token coloring in all themes and languages, unless you have also changed `"editor.semanticHighlighting.enabled"` from its default value of `"configuredByTheme"`.
+Atenção: definir `"enabled": false` no objeto acima não desabilita apenas as regras contidas nele. Isso desabilita a
+coloração por tokens semânticos em todos os temas e linguagens, a menos que você também tenha alterado
+`"editor.semanticHighlighting.enabled"` do valor padrão `"configuredByTheme"`.
 
-### Custom Themes
+### Temas customizados
 
-To create your own custom color theme that provides coloring for InterSystems semantic tokens or modify your existing theme to do so, use the [semanticHighlighting and semanticTokenColors settings](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide#theming) in your theme definition json file. For example:
+Para criar seu próprio tema com suporte aos tokens semânticos InterSystems (ou adaptar um tema existente), use as
+configurações [semanticHighlighting e semanticTokenColors](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide#theming)
+no arquivo json de definição do tema. Por exemplo:
 
 ```json
 "semanticHighlighting": true,
@@ -172,29 +280,74 @@ To create your own custom color theme that provides coloring for InterSystems se
 }
 ```
 
-### Semantic Token Reference
+### Referência de tokens semânticos
 
-This extension provides the following high-level semantic tokens for coloring similar features across all supported languages:
+A extensão fornece os seguintes tokens semânticos de alto nível, usados para colorir recursos equivalentes em todas as
+linguagens suportadas:
 
-| ID                         | Description                                           |
-| -------------------------- | ----------------------------------------------------- |
-| `"ISC_ClassMember"`        | InterSystems-wide class member token.                 |
-| `"ISC_ClassName"`          | InterSystems-wide class and routine name token.       |
-| `"ISC_Command"`            | InterSystems-wide command token.                      |
-| `"ISC_Comment"`            | InterSystems-wide comment token.                      |
-| `"ISC_Delimiter"`          | InterSystems-wide delimiter token.                    |
-| `"ISC_DocComment"`         | InterSystems-wide documentation comment token.        |
-| `"ISC_Error"`              | InterSystems-wide error token.                        |
-| `"ISC_Keyword"`            | InterSystems-wide keyword token.                      |
-| `"ISC_LocalVariable"`      | InterSystems-wide local variable token.               |
-| `"ISC_LocalVariableUnset"` | InterSystems-wide unset local variable token.         |
-| `"ISC_MarkupText"`         | InterSystems-wide markup text token.                  |
-| `"ISC_Neutral"`            | InterSystems-wide neutral token.                      |
-| `"ISC_NumericLiteral"`     | InterSystems-wide numeric literal token.              |
-| `"ISC_Operator"`           | InterSystems-wide operator token.                     |
-| `"ISC_Parameter"`          | InterSystems-wide parameter token.                    |
-| `"ISC_PublicVariable"`     | InterSystems-wide public variable and global token.   |
-| `"ISC_SQLFunction"`        | InterSystems-wide SQL function token.                 |
-| `"ISC_SQLKeyword"`         | InterSystems-wide SQL keyword and datatype token.     |
-| `"ISC_StringLiteral"`      | InterSystems-wide string literal token.               |
-| `"ISC_System"`             | InterSystems-wide system function and variable token. |
+| ID                         | Descrição                                  |
+| -------------------------- | ------------------------------------------ |
+| `"ISC_ClassMember"`        | Token de membro de classe.                 |
+| `"ISC_ClassName"`          | Token de nome de classe e de rotina.       |
+| `"ISC_Command"`            | Token de comando.                          |
+| `"ISC_Comment"`            | Token de comentário.                       |
+| `"ISC_Delimiter"`          | Token de delimitador.                      |
+| `"ISC_DocComment"`         | Token de comentário de documentação.       |
+| `"ISC_Error"`              | Token de erro.                             |
+| `"ISC_Keyword"`            | Token de palavra-chave.                    |
+| `"ISC_LocalVariable"`      | Token de variável local.                   |
+| `"ISC_LocalVariableUnset"` | Token de variável local não atribuída.     |
+| `"ISC_MarkupText"`         | Token de texto de marcação.                |
+| `"ISC_Neutral"`            | Token neutro.                              |
+| `"ISC_NumericLiteral"`     | Token de literal numérico.                 |
+| `"ISC_Operator"`           | Token de operador.                         |
+| `"ISC_Parameter"`          | Token de parâmetro.                        |
+| `"ISC_PublicVariable"`     | Token de variável pública e global.        |
+| `"ISC_SQLFunction"`        | Token de função SQL.                       |
+| `"ISC_SQLKeyword"`         | Token de palavra-chave e tipo de dado SQL. |
+| `"ISC_StringLiteral"`      | Token de literal string.                   |
+| `"ISC_System"`             | Token de função e variável de sistema.     |
+
+## Desenvolvimento
+
+Pré-requisito: Node.js 24 (mesma versão usada no CI).
+
+```bash
+npm install          # instala dependências da raiz, client/, server/ e common/
+npm run compile      # build TypeScript de common/ + client/ + server/
+npm run watch        # build incremental
+npm run webpack:dev  # build webpack para debug local
+npm run lint         # eslint + prettier
+```
+
+O `server/src/**` importa `server/lib/isclexer.node`, que é _gitignored_. Gere o arquivo localmente com:
+
+```bash
+npm run select-isclexer                            # detecta SO/arquitetura automaticamente
+ISCLEXER_TARGET=win32-x64 npm run select-isclexer  # cross-build
+```
+
+Para gerar o `.vsix`:
+
+```bash
+npm run package:current      # target da máquina atual
+npm run package:win32-x64    # target específico
+```
+
+Depuração: use `.vscode/launch.json` → **Launch Client** e, se necessário, **Attach to Server** (porta 6009).
+
+Convenções de código, fluxo de PR e detalhes da estrutura do projeto estão em [CONTRIBUTING.md](CONTRIBUTING.md).
+Diretrizes para agentes de IA estão em [AGENTS.md](AGENTS.md) e nos arquivos `AGENTS.md` de cada subpasta.
+
+## Versionamento e releases
+
+- A numeração acompanha a versão do upstream (`2.8.x`); a branch `master` mantém o sufixo `-SNAPSHOT`.
+- Cada push em `master` gera uma _pre-release_ `v<versão>-beta.N` com os `.vsix` de todas as plataformas.
+- Releases publicadas anexam os `.vsix` definitivos e disparam o _bump_ automático de versão.
+- O histórico de mudanças do projeto original está em [CHANGELOG.md](CHANGELOG.md).
+
+## Licença e créditos
+
+Projeto originalmente desenvolvido e mantido pela [InterSystems&reg;](http://www.intersystems.com) — veja
+[LICENSE.txt](LICENSE.txt). Este fork é mantido pela [Consistem&reg;](https://consistem.com.br/) para uso no seu
+ecossistema de desenvolvimento.
