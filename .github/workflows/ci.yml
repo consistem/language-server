@@ -29,7 +29,7 @@ jobs:
         platarch: [win32-x64, win32-arm64, linux-x64, linux-arm64, alpine-x64, alpine-arm64, darwin-x64, darwin-arm64]
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Fetch tags
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Set package name and version
@@ -48,7 +48,7 @@ jobs:
           jq --arg version "$VERSION" '.version = $version' package.json > "$tmp" && mv "$tmp" package.json
           echo $VERSION > meta.version
       - name: Use Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
       - run: npm install
@@ -57,14 +57,14 @@ jobs:
           ISCLEXER_TARGET: ${{ matrix.platarch }}
         run: npx vsce package -o ${{ steps.set-version.outputs.name }}.vsix --target ${{ matrix.platarch }}
       - name: Upload package
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.set-version.outputs.name }}.vsix
           path: ${{ steps.set-version.outputs.name }}.vsix
           retention-days: 30
       - name: Upload metadata
         if: matrix.platarch == 'linux-arm64'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: meta
           retention-days: 1
@@ -99,6 +99,9 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      id-token: write
+      contents: write
     if: success() && github.event_name == 'release'
     steps:
       - name: Download packages
@@ -116,7 +119,7 @@ jobs:
     if: github.event_name == 'release'
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: master
       - name: Download metadata
@@ -125,7 +128,7 @@ jobs:
           name: meta
           path: .
       - name: Use Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Create commit
@@ -138,6 +141,7 @@ jobs:
           jq --arg version "${NEXT_VERSION}-SNAPSHOT" '.version = $version' package.json > "$tmp" && mv "$tmp" package.json
           jq --arg version "${NEXT_VERSION}-SNAPSHOT" '.version = $version' ./client/package.json > "$tmp" && mv "$tmp" ./client/package.json
           jq --arg version "${NEXT_VERSION}-SNAPSHOT" '.version = $version' ./server/package.json > "$tmp" && mv "$tmp" ./server/package.json
+          jq --arg version "${NEXT_VERSION}-SNAPSHOT" '.version = $version' ./common/package.json > "$tmp" && mv "$tmp" ./common/package.json
           git add package.json
           git add ./client/package.json
           git add ./server/package.json

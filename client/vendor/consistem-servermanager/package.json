@@ -1,6 +1,6 @@
 {
 	"name": "@consistem-sistemas/consistem-servermanager",
-	"version": "3.14.1",
+	"version": "3.15.0-beta.3",
 	"description": "InterSystems Server Manager VS Code extension API interfaces and constants (vendored for offline/CI builds)",
 	"types": "index.d.ts",
 	"main": "index.js",

@@ -10,6 +10,7 @@ export default tseslint.config(
             "server/out/**",
             "common/out/**",
             "**/*.config.{mjs,js}",
+            "client/vendor/**",
         ],
     },
     eslint.configs.recommended,
@@ -21,7 +22,7 @@ export default tseslint.config(
         },
     },
     {
-        files: ["scripts/**/*.js", "client/vendor/**/*.js"],
+        files: ["scripts/**/*.js"],
         languageOptions: {
             globals: {
                 require: "readonly",
