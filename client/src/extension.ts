@@ -16,13 +16,7 @@ import {
 	authentication,
 } from "vscode";
 
-import {
-	DocumentSelector,
-	LanguageClient,
-	LanguageClientOptions,
-	ServerOptions,
-	TransportKind,
-} from "vscode-languageclient/node";
+import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from "vscode-languageclient/node";
 
 import { gt, lte, lt } from "semver";
 import * as serverManager from "@consistem-sistemas/consistem-servermanager";
@@ -47,7 +41,7 @@ import {
 import { ISCEmbeddedContentProvider, requestForwardingMiddleware } from "./requestForwarding";
 import type { ServerSpec, ProtocolMethods } from "../../common/out/types";
 import type { Disposable } from "vscode-languageclient";
-import { Authorization, ResolvedAuthorization } from "@consistem-sistemas/consistem-servermanager";
+import { BasicAuthorization } from "@consistem-sistemas/consistem-servermanager";
 
 export let client: {
 	onRequest<K extends keyof ProtocolMethods>(
@@ -121,6 +115,19 @@ const resolvedServerSpecs = new (class {
 	}
 })();
 
+/** `server` as the language server gets it: credentials stay in `resolvedServerSpecs`, off the LSP channel and its trace. */
+function withoutCredentials(server: ServerSpec): ServerSpec {
+	const copy: ServerSpec & { password?: string } = { ...server };
+	delete copy.credentials;
+	delete copy.password;
+	return copy;
+}
+
+/** `server` with the credentials `resolvedServerSpecs` holds for it, for making a request on the language server's behalf. */
+function withCredentials(server: ServerSpec): ServerSpec {
+	return { ...server, credentials: resolvedServerSpecs.list(server)[0]?.credentials };
+}
+
 export async function activate(context: ExtensionContext) {
 	// Get the main extension exported API
 	const objectScriptExt = extensions.getExtension("consistem-sistemas.consistem-vscode-objectscript")!;
@@ -151,24 +158,8 @@ export async function activate(context: ExtensionContext) {
 		"objectscript-csp",
 		"objectscript-macros",
 	];
-
-	// The uri schemes we handle those languages for
-	const targetSchemes = [
-		"isfs",
-		"isfs-readonly",
-		"objectscript",
-		"objectscriptxml",
-		"file",
-		"vscode-remote",
-		"vscode-notebook-cell",
-	];
-
-	// A document selector to target the right {language, scheme} tuples
-	const documentSelector: DocumentSelector = [];
-	targetLanguages.forEach((language) => {
-		targetSchemes.forEach((scheme) => {
-			documentSelector.push({ language, scheme });
-		});
+	const documentSelector = targetLanguages.map((language) => {
+		return { language };
 	});
 
 	// Options to control the language client
@@ -224,11 +215,8 @@ export async function activate(context: ExtensionContext) {
 				// Server was resolved
 				serverSpec.host !== "" &&
 				// Connection isn't unauthenticated
-				auth.username != undefined &&
-				auth.username != "" &&
-				auth.username.toLowerCase() != "unknownuser" &&
-				// A password is missing
-				typeof auth.password === "undefined" &&
+				auth.username &&
+				!auth.resolved() &&
 				// A supported version of the Server Manager is installed
 				serverManagerExt != undefined &&
 				gt(serverManagerExt.packageJSON.version, "3.0.0")
@@ -263,14 +251,6 @@ export async function activate(context: ExtensionContext) {
 					}
 				}
 			}
-			if (
-				typeof auth.username == "string" &&
-				auth.username.toLowerCase() == "unknownuser" &&
-				typeof auth.password == "undefined"
-			) {
-				// UnknownUser without a password means "unauthenticated"
-				auth.clear() as void;
-			}
 			const server: ServerSpec = {
 				...serverSpec,
 				username: auth.username,
@@ -304,7 +284,10 @@ export async function activate(context: ExtensionContext) {
 	const textDecoder = new TextDecoder();
 	context.subscriptions.push(
 		// Register custom request handlers
-		client.onRequest("intersystems/server/resolveFromUri", (uri) => resolveServerSpec(Uri.parse(uri))),
+		client.onRequest("intersystems/server/resolveFromUri", async (uri) => {
+			const server = await resolveServerSpec(Uri.parse(uri));
+			return server && withoutCredentials(server);
+		}),
 		client.onRequest("intersystems/uri/localToVirtual", (uri) => {
 			const newuri: Uri = objectScriptApi.serverDocumentUriForUri(Uri.parse(uri));
 			return newuri.toString();
@@ -328,14 +311,20 @@ export async function activate(context: ExtensionContext) {
 		}),
 		client.onRequest("intersystems/server/makeRESTRequest", async (args) => {
 			// As of version 2.0.0, REST requests are made on the client side
-			return makeRESTRequest(args.method, args.api, args.path, args.server, args.data, args.checksum, args.params).then(
-				(respdata) => {
-					if (respdata) {
-						// Can't return the entire AxiosResponse object because it's not JSON.stringify-able due to circularity
-						return { data: respdata.data };
-					}
-				},
-			);
+			return makeRESTRequest(
+				args.method,
+				args.api,
+				args.path,
+				withCredentials(args.server),
+				args.data,
+				args.checksum,
+				args.params,
+			).then((respdata) => {
+				if (respdata) {
+					// Can't return the entire AxiosResponse object because it's not JSON.stringify-able due to circularity
+					return { data: respdata.data };
+				}
+			});
 		}),
 		client.onRequest(
 			"intersystems/uri/getText",
@@ -363,7 +352,7 @@ export async function activate(context: ExtensionContext) {
 							"GET",
 							1,
 							`/doc/${fileName}`,
-							params.server,
+							withCredentials(params.server),
 							undefined,
 							undefined,
 							docParams,
@@ -389,17 +378,17 @@ export async function activate(context: ExtensionContext) {
 		commands.registerTextEditorCommand("intersystems.language-server.setSelection", setSelection),
 
 		workspace.onWillSaveTextDocument((event) => {
-			if (targetLanguages.includes(event.document.languageId) && targetSchemes.includes(event.document.uri.scheme)) {
+			if (targetLanguages.includes(event.document.languageId)) {
 				scheduleFormatSkip(event.document.uri.toString(true));
 			}
 		}),
 		workspace.onDidSaveTextDocument((document) => {
-			if (targetLanguages.includes(document.languageId) && targetSchemes.includes(document.uri.scheme)) {
+			if (targetLanguages.includes(document.languageId)) {
 				clearFormatSkip(document.uri.toString(true));
 			}
 		}),
 		workspace.onDidCloseTextDocument((document) => {
-			if (targetLanguages.includes(document.languageId) && targetSchemes.includes(document.uri.scheme)) {
+			if (targetLanguages.includes(document.languageId)) {
 				removeFormatSkip(document.uri.toString(true));
 			}
 		}),
@@ -413,7 +402,7 @@ export async function activate(context: ExtensionContext) {
 			return commandsApi.onDidExecuteCommand((event) => {
 				const activeDoc = window.activeTextEditor?.document;
 				if (activeDoc === undefined) return;
-				if (!targetLanguages.includes(activeDoc.languageId) || !targetSchemes.includes(activeDoc.uri.scheme)) return;
+				if (!targetLanguages.includes(activeDoc.languageId)) return;
 				const activeUri = activeDoc.uri.toString(true);
 				if (event.command === "editor.action.formatDocument") {
 					allowManualFormat(activeUri);
@@ -546,59 +535,4 @@ export async function deactivate(): Promise<void> {
 		);
 	}
 	await Promise.allSettled(promises);
-}
-
-// A copy of the BasicAuthorization class from ServerManager
-// We use it to patch older version of getServerSpec.
-export default class BasicAuthorization implements Authorization {
-	#username?: string;
-	#password?: string;
-	constructor(username?: string, password?: string) {
-		this.#username = username;
-		this.#password = password;
-	}
-
-	public get username(): string {
-		return this.#username || "";
-	}
-
-	public get password(): string | undefined {
-		return this.#password;
-	}
-
-	public get accessToken(): string | undefined {
-		return this.#password;
-	}
-
-	public get httpAuthorizationHeader(): string {
-		return `Basic ${Buffer.from(`${this.#username}:${this.#password}`).toString("base64")}`;
-	}
-
-	public resolved(): this is ResolvedAuthorization {
-		return this.username !== "" && this.#password !== undefined;
-	}
-
-	public resolve(param: { accessToken: string; username?: string }): this is ResolvedAuthorization {
-		this.#username = param.username ?? this.#username;
-		this.#password = param.accessToken ?? this.#password;
-		return this.resolved();
-	}
-
-	public clear(): asserts this is Authorization {
-		this.#password = undefined;
-	}
-
-	public get credentials(): { auth: { username: string; password: string }; headers?: Record<string, string> } {
-		return {
-			auth: {
-				username: this.username,
-				password: this.password!,
-			},
-			headers: {},
-		};
-	}
-
-	public clone(): BasicAuthorization {
-		return new BasicAuthorization(this.#username, this.#password);
-	}
 }
