@@ -216,8 +216,6 @@ export async function activate(context: ExtensionContext) {
 				serverSpec.host !== "" &&
 				// Connection isn't unauthenticated
 				auth.username &&
-				// Server Manager < 3.15 (e.g. consistem-servermanager 3.14.x) doesn't treat UnknownUser as resolved
-				!BasicAuthorization.isUnknownUser(auth.username) &&
 				!auth.resolved() &&
 				// A supported version of the Server Manager is installed
 				serverManagerExt != undefined &&
