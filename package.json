@@ -4,7 +4,7 @@
   "description": "A language server for InterSystems ObjectScript, based on the official project and maintained by Consistem.",
   "author": "InterSystems Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
-  "version": "2.8.8-SNAPSHOT",
+  "version": "2.8.9-SNAPSHOT",
   "publisher": "consistem-sistemas",
   "repository": {
     "type": "github",
